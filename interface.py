@@ -257,7 +257,7 @@ def graph_with_points(x_values, y_values, function, x_symbol = sp.symbols("x")):
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', name='Polynomial P(x)'))
-    fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='markers', name='Data Points'))
+    fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='markers', name='Data Points', marker=dict(color='red', size=8)))
 
 
     fig.update_layout(

@@ -23,57 +23,113 @@ from Views.multiple_roots_v import show_multiple_roots
 from Views.SOR_v import show_SOR
 from Views.spline_cubic_v import show_cubic_spline
 
-if "page" not in st.session_state:
-    st.session_state.page = "main"
-
-def main():
-    st.set_page_config(
+st.set_page_config(
         page_title="Numerical Methods",
         page_icon="📈",
         layout="wide",
         initial_sidebar_state="expanded",
     )
-    st.title("Chapter 1: Finding Roots")
-    st.sidebar.title("Navigation")
-    st.sidebar.markdown("[Bisection Method](#bisection-method)")
-    st.sidebar.markdown("[False Position Method](#false-position-method)")
-    st.sidebar.markdown("[Newton's Method](#newtons-method)")
-    st.sidebar.markdown("[Secant Method](#secant-method)")
-    st.sidebar.markdown("[Fixed Point Iteration](#fixed-point-iteration)")
-    st.sidebar.markdown("[Multiple roots Method](#multiple-roots-method)")
 
-    st.title("Chapter 2: Solving systems of equations")
-    st.sidebar.markdown("[Gauss Elimination Simple Method](#gauss-elimination-method)")
-    st.sidebar.markdown("[Gauss Elimination with Partial Pivoting](#gauss-elimination-with-partial-pivoting)")
-    st.sidebar.markdown("[Gauss Elimination Total Pivot Method](#gauss-elimination-total-pivot-method)")
-    st.sidebar.markdown("[LU Decomposition Method](#lu-decomposition-method)")
-    st.sidebar.markdown("[PLU Method](#plu-method)")
-    st.sidebar.markdown("[Gauss Seidel Method](#gauss-seidel-method)")
-    st.sidebar.markdown("[Jacobi Method](#jacobi-method)")
-    st.sidebar.markdown("[SOR Method](#sor-method)")
+st.markdown("""
+    <style>
+    /* Fondo general y texto */
+    .stApp {
+        background-color: #0a192f;  /* azul oscuro */
+        color: white;
+    }
 
-    st.title("Chapter 3: Interpolation")
-    st.sidebar.markdown("[Lagrange Interpolation](#lagrange-interpolation)")
-    st.sidebar.markdown("[Newton's Divided Difference Interpolation](#newtons-divided-difference-interpolation)")
-    st.sidebar.markdown("[Spline Linear](#spline-linear-interpolation)")
-    st.sidebar.markdown("[Spline cubic](#spline-cubic-interpolation)")
-    st.sidebar.markdown("[Spline Quadratic](#spline-quadratic-interpolation)")
+    /* Sidebar fondo y texto */
+    section[data-testid="stSidebar"] {
+        background-color: #112240;  /* azul oscuro más claro */
+        color: white;
+    }
 
-    st.sidebar.title("Navigation")
+    /* Títulos */
+    h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
 
-    if st.sidebar.button("Home"):
-        st.session_state.page = "main"
-    if st.sidebar.button("Graph"):
-        st.session_state.page = "graph"
-    if st.sidebar.button("Finding roots"):
-        st.session_state.page = "roots"
-    if st.sidebar.button("Solving systems of equations"):
-        st.session_state.page = "systems"
-    if st.sidebar.button("Interpolation"):
-        st.session_state.page = "interpolation"
+    /* Inputs y selects */
+    input, textarea, select {
+        color: white !important;
+        background-color: #1c2c4c !important;
+        border: 1px solid #ffffff33;
+    }
+
+    /* Selectbox desplegado */
+    .stSelectbox div[role="button"] {
+        background-color: #1c2c4c !important;
+        color: white !important;
+    }
+
+    /* Botones */
+    .stButton>button {
+        background-color: #2563eb;  /* azul */
+        color: white;
+        border-radius: 8px;
+        padding: 0.5em 1em;
+        font-weight: bold;
+    }
+
+    .stButton>button:hover {
+        background-color: #1e40af;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+if "page" not in st.session_state:
+    st.session_state.page = "main"
+
+def main():
+    st.sidebar.subheader("This are the methods available in this app:")
+    st.sidebar.subheader("Chapter 1: Finding Roots")
+    st.sidebar.markdown("- Bisection Method")
+    st.sidebar.markdown("- False Position Method")
+    st.sidebar.markdown("- Newton's Method")
+    st.sidebar.markdown("- Secant Method")
+    st.sidebar.markdown("- Fixed Point Iteration")
+    st.sidebar.markdown("- Multiple roots Method")
+
+    st.sidebar.subheader("Chapter 2: Solving Systems of Equations")
+    st.sidebar.markdown("- Gauss Elimination Simple Method")
+    st.sidebar.markdown("- Gauss Elimination with Partial Pivoting")
+    st.sidebar.markdown("- Gauss Elimination Total Pivot Method")
+    st.sidebar.markdown("- LU Decomposition Method")
+    st.sidebar.markdown("- PLU Method")
+    st.sidebar.markdown("- Gauss Seidel Method")
+    st.sidebar.markdown("- Jacobi Method")
+    st.sidebar.markdown("- SOR Method")
+
+    st.sidebar.subheader("Chapter 3: Interpolation")
+    st.sidebar.markdown("- Lagrange Interpolation")
+    st.sidebar.markdown("- Newton's Divided Difference Interpolation")
+    st.sidebar.markdown("- Spline Linear")
+    st.sidebar.markdown("- Spline cubic")
+    st.sidebar.markdown("- Spline Quadratic")
+
+    st.header("Numerical Methods App: Menu")
+    col1,col2,col3,col4, col5 = st.columns(5)
+
+    with col1:
+        if st.button("🏠Home"):
+            st.session_state.page = "main"
+    with col2:
+        if st.button("📈Graph"):
+            st.session_state.page = "graph"
+    with col3:
+        if st.button("Finding roots"):
+            st.session_state.page = "roots"
+    with col4:
+        if st.button("Solving systems of equations"):
+            st.session_state.page = "systems"
+    with col5:
+        if st.button("Interpolation"):
+            st.session_state.page = "interpolation"
 
     if st.session_state.page == "main":
-        main()
+        st.write("In this app you can find the different numerical methods used to solve mathematical problems viewed in class.")
+        st.write("Select a method from the menu to get started.")
     elif st.session_state.page == "graph":
         show_graph()
     elif st.session_state.page == "roots":
@@ -157,4 +213,7 @@ def main():
         elif interpolation_method == "Spline Quadratic Interpolation":
             show_quadratic_spline()
 
+if __name__ == "__main__":
+    main()
+# This is the main entry point for the application.
 
