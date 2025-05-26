@@ -3,5 +3,5 @@
 Analisis Numerico 2025-1
 
 Run
-´´´bash
+```bash
 streamlit run main.py
