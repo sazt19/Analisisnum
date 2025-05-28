@@ -3,12 +3,11 @@ import sympy as sp
 
 def newton_interpolation(x, y, decimals, x_sym=sp.symbols("x")):
     n = len(x)
-    matrix = np.zeros((n, n))  # Create a square matrix of size len(x)
+    matrix = np.zeros((n, n))  # Crea la matriz cuadrada
 
-    # Fill the first column with y values
+    # Llenar la primera columna con los valores de y
     for i in range(n):
         matrix[i, 0] = y[i]
-    # Compute the divided differences
     for col in range(1, n):
         for row in range(col, n):
             matrix[row, col] = (matrix[row, col-1] - matrix[row-1, col-1]) / (x[row] - x[row-col])

@@ -1,90 +1,94 @@
-import numpy as np
-import pandas as pd
+import numpy as np        # Librería para operaciones matemáticas y matrices
+import pandas as pd       # Librería para construir tablas de resultados (DataFrame)
 
+# Función para calcular el error entre dos iteraciones consecutivas
 def calculate_error(X, X_L, norm=2, error_type=None):
-    # Compute absolute difference between the true and predicted values
-    diff = np.abs(X - X_L)
-    # Choose norm calculation based on norm
-    if norm == 1:  # L1 norm (sum of absolute differences)
+    diff = np.abs(X - X_L)  # Diferencia absoluta entre la solución nueva y la anterior
+
+    # Cálculo del error según la norma seleccionada
+    if norm == 1:  # Norma L1: suma de los valores absolutos
         norm_error = np.sum(diff)
-    elif norm == 2:  # L2 norm (Euclidean distance)
+    elif norm == 2:  # Norma L2: distancia euclidiana
         norm_error = np.sqrt(np.sum(diff**2))
-    elif norm == 'inf':  # L∞ norm (maximum difference)
+    elif norm == 'inf':  # Norma infinito: el valor máximo de la diferencia
         norm_error = np.max(diff)
     else:
-        raise ValueError("Invalid value for error_rel. Must be 1, 2, or 'inf'.")
+        raise ValueError("Valor inválido para la norma. Debe ser 1, 2 o 'inf'.")
 
-    # Relative error if "Significant Figures" is selected
+    # Si el tipo de error es "cifras significativas", se calcula el error relativo
     if error_type == "Significant Figures":
-        relative_error = norm_error / np.abs(X).max()  # Relative to the max value of X
+        relative_error = norm_error / np.abs(X).max()  # Se normaliza por el valor más grande de X
         error = relative_error
 
-    # Absolute error if "Correct Decimals" is selected
+    # Si el tipo de error es "decimales correctos", se deja el error absoluto
     elif error_type == "Correct Decimals":
         error = norm_error
-
     else:
-        raise ValueError("Invalid value for error_type. Must be 'Significant Figures' or 'Correct Decimals'.")
+        raise ValueError("Tipo de error inválido. Debe ser 'Significant Figures' o 'Correct Decimals'.")
 
     return error
 
-
+# Función para calcular el radio espectral de la matriz de iteración T
 def rad_esp(T):
-    eig = np.linalg.eigvals(T)  # Compute eigenvalues of T
-    rsp = np.max(np.abs(eig))  # Spectral radius is the max absolute eigenvalue
+    eig = np.linalg.eigvals(T)         # Se calculan los eigenvalores (valores propios)
+    rsp = np.max(np.abs(eig))          # El radio espectral es el valor absoluto máximo
     return rsp
 
-
+# Función para construir la tabla con las soluciones por iteración
 def make_tableMat(x_m_list, errores):
-    table = pd.DataFrame(x_m_list[1:], columns=x_m_list[0])  # Convert the list to a DataFrame
-    table["Error"] = errores  # Add error column to the DataFrame
+    table = pd.DataFrame(x_m_list[1:], columns=x_m_list[0])  # Crear DataFrame desde la lista de soluciones
+    table["Error"] = errores                                  # Añadir columna de errores
     return table
 
+# Método de Jacobi para resolver sistemas lineales Ax = b
 def jacobi_method(A, b, X_i, tol, niter, norm=2, error_type="Significant Figures"):
     err = None
-    errores = [100]  # List to track errors
+    errores = [100]  # Lista para registrar los errores por iteración
     if error_type == "Significant Figures":
-        errores = [0]
-    # Initialize the table of X values
-    X_val = [list(f"X_{i+1}" for i in range(len(b)))]  # Create labels for X values
-    X_val.append(list(map(int, X_i)))  # Add initial guess to the table as a list of integers
-    # Check if A is singular (non-invertible)
+        errores = [0]  # Si se usan cifras significativas, comenzamos con error 0
+
+    # Crear etiquetas X_1, X_2, ..., y agregar la solución inicial
+    X_val = [list(f"X_{i+1}" for i in range(len(b)))]
+    X_val.append(list(map(int, X_i)))  # Convertimos X_i a enteros para mostrar la tabla
+
+    # Verificar que la matriz diagonal (D) sea invertible
     try:
-        # Try to compute the inverse of D (the diagonal matrix)
-        D = np.diag(np.diagonal(A))
-        np.linalg.inv(D)  # If D is singular, this will raise an exception
+        D = np.diag(np.diagonal(A))    # Extraemos la matriz diagonal de A
+        np.linalg.inv(D)               # Intentamos invertir D
     except np.linalg.LinAlgError:
-        err = "Matrix A is singular (non-invertible). Please check the matrix and try again."
-        X = []
+        err = "La matriz A es singular (no invertible). Verifica la matriz e intenta de nuevo."
         return None, None, None, err, None, None
-    # Split matrix A into diagonal, lower, and upper parts
+
+    # Descomposición de A en D (diagonal), L (parte inferior), U (parte superior)
     D = np.diag(np.diagonal(A))
-    L = -1 * np.tril(A, -1)
-    U = -1 * np.triu(A, 1)
-    # Compute T and C matrices for Jacobi method
+    L = -1 * np.tril(A, -1)  # Parte inferior (sin diagonal), con signo invertido
+    U = -1 * np.triu(A, 1)   # Parte superior (sin diagonal), con signo invertido
+
+    # Cálculo de las matrices de iteración T y C para el método de Jacobi
     T = np.linalg.inv(D) @ (L + U)
     C = np.linalg.inv(D) @ b
-    # Check if initial guess already satisfies the tolerance
-    E = (A @ X_i) - b  # Residual error
+
+    # Verificar si la solución inicial ya cumple con la tolerancia
+    E = (A @ X_i) - b  # Cálculo del residuo (Ax - b)
     if np.allclose(E, np.zeros(len(b)), atol=tol):
         return X_i, make_tableMat(X_val, errores), rad_esp(T), err, T, C
 
-    # Jacobi iteration loop
-    X = X_i.copy()  # Initialize X with the initial guess
+    # Iteraciones de Jacobi
+    X = X_i.copy()  # Inicializamos X con la estimación inicial
+
     for i in range(1, niter):
-        X_L = X.copy()  # Save current solution for error calculation
-        X = T @ X + C  # Update solution
-        # Append the new solution to the table
-        X_val.append(np.squeeze(X))
-        # Calculate the error
-        error = calculate_error(X, X_L, norm, error_type)
+        X_L = X.copy()          # Guardamos la solución anterior
+        X = T @ X + C           # Aplicamos la fórmula de Jacobi
+
+        X_val.append(np.squeeze(X))  # Añadimos la solución a la tabla
+
+        error = calculate_error(X, X_L, norm, error_type)  # Calculamos el error
         errores.append(error)
-        # If error is smaller than tolerance, stop the iterations
-        if error < tol:
+
+        if error < tol:  # Si el error es menor que la tolerancia, detenemos
             return X, make_tableMat(X_val, errores), rad_esp(T), err, T, C
 
-    # If the method doesn't converge within the given iterations, raise an error
-    err  = f"Jacobi method did not converge after {niter} iterations. Please check system parameters or increase the number of iterations."
+    # Si el método no converge dentro del número de iteraciones
+    err = f"El método de Jacobi no convergió después de {niter} iteraciones. Revisa los parámetros del sistema o aumenta el número de iteraciones."
 
-    # Return after reaching max iterations
     return X, make_tableMat(X_val, errores), rad_esp(T), err, T, C

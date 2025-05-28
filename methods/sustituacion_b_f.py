@@ -1,5 +1,7 @@
 import numpy as np
 
+# se resuelven sistemas de ecuaciones lineales Ax = b
+#para matrices triangulares superiores (back substitution) y triangulares inferiores (forward substitution)
 def back_substitution(A,b):
     n = len(A)
     x = np.zeros(n)
