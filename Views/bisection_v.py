@@ -76,8 +76,7 @@ def show_bisection():
 
         function = sp.lambdify(x, sp.sympify(function_input), 'numpy')
 
-        # DO CHECKS ON INPUT INTEGRITY
-        # check if derivative is continuous in general
+        # revisa si la derivada es continua en el intervalo
 
         result = bisection(a, b, niter, tol, tolerance_type, function)
 
@@ -88,7 +87,7 @@ def show_bisection():
         else:
             result = result["table"]
 
-        # Add a slider to choose the number of decimals to display
+        # escoger cuantos números decimales se quieren ver
         decimals = st.slider(
             "Select number of decimals to display on table",
             min_value=1,
@@ -96,7 +95,6 @@ def show_bisection():
             value=4,
             help="Adjust the number of decimal places for the result table."
         )
-        # Format the dataframe to display the selected number of decimals
         result_display = result.style.format(f"{{:.{decimals}f}}")  # Use f-string to format dynamically
 
         st.subheader("Results")
